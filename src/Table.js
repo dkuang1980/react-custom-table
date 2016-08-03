@@ -1,27 +1,27 @@
-import React, { Component } from 'react'
+import React, { Component, PropTypes } from 'react'
 import classNames from 'classnames/bind'
-import { Set, Map } from 'immutable'
+import { Set } from 'immutable'
 
 
 export default class Table extends Component {
 
   static propTypes = {
-    idKey: React.PropTypes.string,
-    tableClass: React.PropTypes.string,
-    sortableClass: React.PropTypes.string,
-    sortDescClass: React.PropTypes.string,
-    sortAscClass: React.PropTypes.string,
-    selectedClass: React.PropTypes.string,
-    selectable: React.PropTypes.bool,
-    columns: React.PropTypes.array,
-    rows: React.PropTypes.array,
-    selectColumnFormat: React.PropTypes.func,
-    onSort: React.PropTypes.func,
-    onRowClick: React.PropTypes.func
+    idKey: PropTypes.string,
+    tableClass: PropTypes.string,
+    sortableClass: PropTypes.string,
+    sortDescClass: PropTypes.string,
+    sortAscClass: PropTypes.string,
+    selectedClass: PropTypes.string,
+    selectable: PropTypes.bool,
+    columns: PropTypes.array,
+    rows: PropTypes.array,
+    selectColumnFormat: PropTypes.func,
+    onSort: PropTypes.func,
+    onRowClick: PropTypes.func
   }
 
   static defaultProps = {
-    idKey: "id",
+    idKey: 'id',
     selectable: false,
     columns: [],
     rows: []
@@ -32,21 +32,22 @@ export default class Table extends Component {
 
     this.state = {
       sortCol: null,
-      SortDesc: Map(props.columns.map(col => [col.id, false])),
+      sortDesc: false,
       selected: Set()
     }
   }
 
   handleSort(colId){
-    const { SortDesc } = this.state
+    const { sortCol, sortDesc } = this.state
     const { onSort } = this.props
+    const newSortDesc = colId === sortCol ? !sortDesc : false
 
     this.setState({
       sortCol: colId,
-      SortDesc: SortDesc.set(colId, !SortDesc.get(colId))
+      sortDesc: newSortDesc
     })
 
-    onSort && onSort(colId, SortDesc.get(colId))
+    onSort && onSort(colId, newSortDesc)
   }
 
   handleRowClick(rowId){
@@ -72,7 +73,7 @@ export default class Table extends Component {
             selectable } = this.props
 
     const { sortCol,
-            SortDesc,
+            sortDesc,
             selected } = this.state
 
     return (
@@ -84,8 +85,8 @@ export default class Table extends Component {
                 key={`th-${col.id}`}
                 className={classNames({
                   [sortableClass]: sortableClass && col.sortable,
-                  [sortDescClass]: sortDescClass && col.id === sortCol && SortDesc.get(col.id),
-                  [sortAscClass]: sortAscClass && col.id === sortCol && !SortDesc.get(col.id)
+                  [sortDescClass]: sortDescClass && col.id === sortCol && sortDesc,
+                  [sortAscClass]: sortAscClass && col.id === sortCol && !sortDesc
                 })}
                 onClick={col.sortable ? this.handleSort.bind(this, col.id): null}>
 

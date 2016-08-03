@@ -1,22 +1,34 @@
-import React, { Component }  from 'react'
+import React, { Component, cloneElement, Children, PropTypes }  from 'react'
 import Table from './Table'
+import Paginator from './Paginator'
 
 
-class TableContainer extends React.Component {
+class TableContainer extends Component {
 
   static propTypes = {
-    containerClass: React.PropTypes.string
+    containerClass: PropTypes.string,
+    columns: PropTypes.array,
+    rows: PropTypes.array
   }
 
   render(){
-    const { containerClass, children } = this.props
+    const { containerClass,
+            columns,
+            rows,
+            children } = this.props
 
     return (
       <div className={containerClass}>
-        { children }
+        {Children.map(children, child =>{
+            if (child.type.name === 'Table')
+              return cloneElement(child, { ...child.props, columns, rows})
+            if (child.type.name === 'ColumnSelector')
+              return cloneElement(child, { ...child.props, columns })
+            return child
+        })}
       </div>
     )
   }
 }
 
-export { TableContainer, Table }
+export { TableContainer, Table, Paginator }
