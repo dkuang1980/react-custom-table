@@ -1,11 +1,12 @@
 {
-  "name": "react-smart-table",
+  "name": "react-custom-table",
   "version": "0.0.1",
   "description": "Render table in react, fully customizable, compatible with redux",
   "main": "index.js",
-  "repository": "git@github.com:Da-Kuang/ReactSmartTable.git",
+  "repository": "git@github.com:Da-Kuang/ReactCustomTable.git",
   "scripts": {
     "start": "node ./node_modules/webpack-dev-server/bin/webpack-dev-server.js",
+    "dev": "webpack --progress  --watch",
     "test": "mocha --compilers js:babel-core/register --require ./test/test_helper.js --recursive ./test",
     "test:watch": "npm run test -- --watch"
   },
@@ -30,5 +31,9 @@
   "peerDependencies": {
     "react": "*",
     "react-dom": "*"
+  },
+  "dependencies": {
+    "classnames": "^2.2.5",
+    "immutable": "^3.8.1"
   }
 }

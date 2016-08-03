@@ -1,3 +1,5 @@
+var path = require('path');
+
 module.exports = {
   entry: [
     './index.js'
@@ -6,7 +8,7 @@ module.exports = {
       path: path.join(__dirname, 'build'),
       publicPath: '/',
       filename: '[name].js',
-      library: 'ReactSmartTable',
+      library: 'ReactCustomTable',
       libraryTarget: 'umd'
   },
   module: {
