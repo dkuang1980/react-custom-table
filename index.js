@@ -1,1 +1,1 @@
-module.exports = require('./src/TableContainer.js');
+module.exports = require('./dist/index.js');

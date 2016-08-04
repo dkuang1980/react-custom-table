@@ -2,12 +2,12 @@ var path = require('path');
 
 module.exports = {
   entry: [
-    './index.js'
+    './src/TableContainer.js'
   ],
-   output: {
-      path: path.join(__dirname, 'build'),
+  output: {
+      path: path.join(__dirname, 'dist'),
       publicPath: '/',
-      filename: '[name].js',
+      filename: 'index.js',
       library: 'ReactCustomTable',
       libraryTarget: 'umd'
   },
