@@ -1,9 +1,9 @@
 {
   "name": "react-custom-table",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Render table in react, fully customizable, compatible with redux",
   "main": "index.js",
-  "repository": "git@github.com:Da-Kuang/ReactCustomTable.git",
+  "repository": "git@github.com:Da-Kuang/react-custom-table.git",
   "scripts": {
     "start": "node ./node_modules/webpack-dev-server/bin/webpack-dev-server.js",
     "dev": "webpack --progress  --watch",
