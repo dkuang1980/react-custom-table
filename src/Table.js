@@ -1,6 +1,5 @@
 import React, { Component, PropTypes } from 'react'
 import classNames from 'classnames/bind'
-import { Set } from 'immutable'
 
 
 export default class Table extends Component {
@@ -12,12 +11,16 @@ export default class Table extends Component {
     sortDescClass: PropTypes.string,
     sortAscClass: PropTypes.string,
     selectedClass: PropTypes.string,
+    sortCol: PropTypes.string,
+    sortDesc: PropTypes.bool,
     selectable: PropTypes.bool,
+    selected: PropTypes.array,
     columns: PropTypes.array,
     rows: PropTypes.array,
     selectColumnFormat: PropTypes.func,
     onSort: PropTypes.func,
-    onRowClick: PropTypes.func
+    onRowClick: PropTypes.func,
+    onSelectAll: PropTypes.func
   }
 
   static defaultProps = {
@@ -27,96 +30,103 @@ export default class Table extends Component {
     rows: []
   }
 
-  constructor(props){
-    super(props)
-
-    this.state = {
-      sortCol: null,
-      sortDesc: false,
-      selected: Set()
-    }
-  }
-
   handleSort(colId){
-    const { sortCol, sortDesc } = this.state
     const { onSort } = this.props
-    const newSortDesc = colId === sortCol ? !sortDesc : false
 
-    this.setState({
-      sortCol: colId,
-      sortDesc: newSortDesc
-    })
-
-    onSort && onSort(colId, newSortDesc)
+    onSort && onSort(colId)
   }
 
   handleRowClick(rowId){
-    const { selected } = this.state
     const { onRowClick } = this.props
 
-    this.setState({
-      selected: selected.has(rowId) ? selected.delete(rowId) : selected.add(rowId)
-    })
-
-    onRowClick && onRowClick(colId)
+    onRowClick && onRowClick(rowId)
   }
 
-  render(){
+  renderTableHead(){
     const { idKey,
-            tableClass,
-            columns,
             rows,
+            columns,
+            selected,
+            selectable,
             sortableClass,
             sortDescClass,
             sortAscClass,
-            selectedClass,
-            selectable } = this.props
-
-    const { sortCol,
+            sortCol,
             sortDesc,
-            selected } = this.state
+            selectColumnFormat,
+            selectAllFormat,
+            onSelectAll } = this.props
+
+    const rowIds = rows.map(row => row[idKey])
+
+    return (
+      <thead>
+        <tr>
+          {selectColumnFormat ?
+            <td onClick={onSelectAll ? onSelectAll.bind(null, rowIds) : null}>
+              {selectAllFormat && selectAllFormat(rowIds.every(id => selected.indexOf(id) > -1))}
+            </td>
+            : null
+          }
+
+          {columns.map(col =>
+            <th
+              key={`th-${col.id}`}
+              className={classNames({
+                [sortableClass]: sortableClass && col.sortable,
+                [sortDescClass]: sortDescClass && col.id === sortCol && sortDesc,
+                [sortAscClass]: sortAscClass && col.id === sortCol && !sortDesc
+              })}
+              onClick={col.sortable ? this.handleSort.bind(this, col.id): null}>
+
+              { col.title }
+
+            </th>
+          )}
+          </tr>
+      </thead>
+    )
+  }
+
+  renderTableBody(){
+    const { idKey,
+            columns,
+            rows,
+            selectedClass,
+            selected,
+            selectColumnFormat } = this.props
+
+    return (
+      <tbody>
+        {rows.map(row =>
+          <tr
+            key={`tr-${row[idKey]}`}
+            className={classNames({
+              [selectedClass]: selectedClass && selected.find(row[idKey])
+            })}
+            onClick={selectColumnFormat ? this.handleRowClick.bind(this, row[idKey]) : null}>
+
+              {selectColumnFormat ? <td>{selectColumnFormat(selected.indexOf(row[idKey]) > -1)}</td> : null}
+
+              {columns.map(col =>
+                <td key={`td-${row[idKey]}-${col.id}`}>
+                  {col.formatFunc ? col.formatFunc(row) : row[col.id]}
+                </td>
+              )}
+
+          </tr>
+        )}
+      </tbody>
+    )
+  }
+
+  render(){
+    const { tableClass } = this.props
 
     return (
       <table className={tableClass}>
-        <thead>
-          <tr>
-            {columns.map(col =>
-              <th
-                key={`th-${col.id}`}
-                className={classNames({
-                  [sortableClass]: sortableClass && col.sortable,
-                  [sortDescClass]: sortDescClass && col.id === sortCol && sortDesc,
-                  [sortAscClass]: sortAscClass && col.id === sortCol && !sortDesc
-                })}
-                onClick={col.sortable ? this.handleSort.bind(this, col.id): null}>
-
-                { col.title }
-
-              </th>
-            )}
-            </tr>
-        </thead>
-
-        <tbody>
-          {rows.map(row =>
-            <tr
-              key={`tr-${row[idKey]}`}
-              className={classNames({
-                [selectedClass]: selectedClass && selected.find(row[idKey])
-              })}
-              onClick={selectable ? this.handleRowClick.bind(this, row[idKey]) : null}>
-
-                {selectable && selectColumnFormat ? <td>selectColumnFormat(!!selected.find(row[idKey]))</td> : null}
-
-                {columns.map(col =>
-                  <td key={`td-${row[idKey]}-${col.id}`}>
-                    {col.formatFunc ? col.formatFunc(row) : row[col.id]}
-                  </td>
-                )}
-
-            </tr>
-          )}
-        </tbody>
+        { this.renderTableHead() }
+        { this.renderTableBody() }
       </table>
     )
   }
