@@ -1,6 +1,6 @@
 {
   "name": "react-custom-table",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Render table in react, fully customizable, compatible with redux",
   "main": "index.js",
   "repository": "git@github.com:Da-Kuang/react-custom-table.git",
@@ -36,5 +36,22 @@
   "dependencies": {
     "classnames": "^2.2.5",
     "immutable": "^3.8.1"
-  }
+  },
+  "keywords": [
+    "react table",
+    "react table view",
+    "react-table",
+    "react redux table",
+    "react customizable table",
+    "react flex table",
+    "reactTable",
+    "reactable table",
+    "react",
+    "reactjs table",
+    "react.js table",
+    "react table component",
+    "table view",
+    "table component",
+    "react-table-view"
+  ]
 }
