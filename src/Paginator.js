@@ -5,18 +5,16 @@ export default class Paginator extends Component {
 
   static propTypes = {
     paginatorClass: PropTypes.string,
-    paginatorContainerClass: PropTypes.string,
     activePageClass: PropTypes.string,
     total: PropTypes.number,
     pageSize: PropTypes.number,
     activePage: PropTypes.number,
     pageLimit: PropTypes.number,
-    pagePageFormat: PropTypes.func,
-    nextPageFormat: PropTypes.func,
-    prevPageFormat: PropTypes.func,
-    firstPageFormat: PropTypes.func,
-    lastPageFormat: PropTypes.func,
-    extraPageFormat: PropTypes.func,
+    pageTemplate: PropTypes.func,
+    nextPageTemplate: PropTypes.func,
+    prevPageTemplate: PropTypes.func,
+    firstPageTemplate: PropTypes.func,
+    lastPageTemplate: PropTypes.func,
     onPageClick: PropTypes.func
   }
 
@@ -55,25 +53,25 @@ export default class Paginator extends Component {
   }
 
   renderFirstPage(){
-    const { firstPageFormat,
+    const { firstPageTemplate,
             activePage } = this.props
 
     return (
-      firstPageFormat && activePage > 0 ?
+      firstPageTemplate && activePage > 0 ?
         <li onClick={this.handlePageClick.bind(this, 0)}>
-          {firstPageFormat()}
+          {firstPageTemplate()}
         </li> : null
     )
   }
 
   renderPrevPage(){
-    const { prevPageFormat,
+    const { prevPageTemplate,
             activePage } = this.props
 
     return (
-      prevPageFormat && activePage > 0 ?
+      prevPageTemplate && activePage > 0 ?
         <li onClick={this.handlePageClick.bind(this, activePage - 1)}>
-          {prevPageFormat()}
+          {prevPageTemplate()}
         </li> : null
     )
   }
@@ -82,7 +80,7 @@ export default class Paginator extends Component {
     const { activePageClass,
             pageLimit,
             total,
-            pageFormat,
+            pageTemplate,
             activePage } = this.props
 
     let pagelowerBound = activePage - pageLimit / 2
@@ -107,7 +105,7 @@ export default class Paginator extends Component {
                 key={i}
                 onClick={this.handlePageClick.bind(this, i)}
                 className={i === activePage ? activePageClass : null}>
-                {pageFormat ? pageFormat(i) : i}
+                {pageTemplate ? pageTemplate(i) : i}
               </li> : null
           )
         })
@@ -115,51 +113,45 @@ export default class Paginator extends Component {
   }
 
   renderNextPage(){
-    const { nextPageFormat,
+    const { nextPageTemplate,
             activePage } = this.props
 
     return (
-      nextPageFormat && activePage > 0 ?
+      nextPageTemplate && activePage < this.totalPages - 1 ?
         <li onClick={this.handlePageClick.bind(this, activePage + 1)}>
-          {nextPageFormat()}
+          {nextPageTemplate()}
         </li> : null
     )
   }
 
   renderLastPage(){
-    const { lastPageFormat,
-            total,
+    const { lastPageTemplate,
             activePage } = this.props
 
     return (
-      lastPageFormat && activePage > 0 ?
-        <li onClick={this.handlePageClick.bind(this, total - 1)}>
-          {lastPageFormat()}
+      lastPageTemplate && activePage < this.totalPages - 1 ?
+        <li onClick={this.handlePageClick.bind(this, this.totalPages - 1)}>
+          {lastPageTemplate()}
         </li> : null
     )
   }
 
   render(){
-    const { paginatorContainerClass,
-            paginatorClass,
+    const { paginatorClass,
             total,
             pageSize,
             pageLimit,
-            extraFormat,
+            extraTemplate,
             activePage } = this.props
 
     return (
-      <div className={paginatorContainerClass}>
-        {extraFormat ? extraFormat(this.totalPages, activePage, total, pageSize) : null}
-
-        <ul className={paginatorClass}>
-          { this.renderFirstPage() }
-          { this.renderPrevPage() }
-          { this.renderPages() }
-          { this.renderNextPage() }
-          { this.renderLastPage() }
-        </ul>
-      </div>
+      <ul className={paginatorClass}>
+        { this.renderFirstPage() }
+        { this.renderPrevPage() }
+        { this.renderPages() }
+        { this.renderNextPage() }
+        { this.renderLastPage() }
+      </ul>
     )
   }
 }

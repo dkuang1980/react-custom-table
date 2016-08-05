@@ -10,14 +10,15 @@ export default class Table extends Component {
     sortableClass: PropTypes.string,
     sortDescClass: PropTypes.string,
     sortAscClass: PropTypes.string,
-    selectedClass: PropTypes.string,
+    selectedRowClass: PropTypes.string,
     sortCol: PropTypes.string,
     sortDesc: PropTypes.bool,
     selectable: PropTypes.bool,
     selected: PropTypes.array,
     columns: PropTypes.array,
     rows: PropTypes.array,
-    selectColumnFormat: PropTypes.func,
+    noResultTemplate: PropTypes.func,
+    selectColumnTemplate: PropTypes.func,
     onSort: PropTypes.func,
     onRowClick: PropTypes.func,
     onSelectAll: PropTypes.func
@@ -27,7 +28,18 @@ export default class Table extends Component {
     idKey: 'id',
     selectable: false,
     columns: [],
-    rows: []
+    rows: [],
+    noResultTemplate: (cols) => {
+      return (
+        <tbody>
+          <tr>
+            <td colSpan={cols} style={{textAlign: "center"}}>
+              Sorry, we could not find any data!
+            </td>
+          </tr>
+        </tbody>
+      )
+    }
   }
 
   handleSort(colId){
@@ -53,8 +65,8 @@ export default class Table extends Component {
             sortAscClass,
             sortCol,
             sortDesc,
-            selectColumnFormat,
-            selectAllFormat,
+            selectColumnTemplate,
+            selectAllTemplate,
             onSelectAll } = this.props
 
     const rowIds = rows.map(row => row[idKey])
@@ -62,9 +74,9 @@ export default class Table extends Component {
     return (
       <thead>
         <tr>
-          {selectColumnFormat ?
+          {selectColumnTemplate ?
             <td onClick={onSelectAll ? onSelectAll.bind(null, rowIds) : null}>
-              {selectAllFormat && selectAllFormat(rowIds.every(id => selected.indexOf(id) > -1))}
+              {selectAllTemplate && selectAllTemplate(rowIds.length > 0 && rowIds.every(id => selected.indexOf(id) > -1))}
             </td>
             : null
           }
@@ -92,9 +104,9 @@ export default class Table extends Component {
     const { idKey,
             columns,
             rows,
-            selectedClass,
+            selectedRowClass,
             selected,
-            selectColumnFormat } = this.props
+            selectColumnTemplate } = this.props
 
     return (
       <tbody>
@@ -102,15 +114,15 @@ export default class Table extends Component {
           <tr
             key={`tr-${row[idKey]}`}
             className={classNames({
-              [selectedClass]: selectedClass && selected.find(row[idKey])
+              [selectedRowClass]: selectedRowClass && selected.indexOf(row[idKey]) > -1
             })}
-            onClick={selectColumnFormat ? this.handleRowClick.bind(this, row[idKey]) : null}>
+            onClick={selectColumnTemplate ? this.handleRowClick.bind(this, row[idKey]) : null}>
 
-              {selectColumnFormat ? <td>{selectColumnFormat(selected.indexOf(row[idKey]) > -1)}</td> : null}
+              {selectColumnTemplate ? <td>{selectColumnTemplate(selected.indexOf(row[idKey]) > -1)}</td> : null}
 
               {columns.map(col =>
                 <td key={`td-${row[idKey]}-${col.id}`}>
-                  {col.formatFunc ? col.formatFunc(row) : row[col.id]}
+                  {col.template ? col.template(row) : row[col.id]}
                 </td>
               )}
 
@@ -121,12 +133,18 @@ export default class Table extends Component {
   }
 
   render(){
-    const { tableClass } = this.props
+    const { tableClass,
+            noResultTemplate,
+            selectColumnTemplate,
+            rows,
+            columns } = this.props
+
+    const tableColNumber = columns.length + (selectColumnTemplate ? 1 : 0)
 
     return (
       <table className={tableClass}>
         { this.renderTableHead() }
-        { this.renderTableBody() }
+        { rows.length > 0 ? this.renderTableBody() : noResultTemplate(tableColNumber) }
       </table>
     )
   }

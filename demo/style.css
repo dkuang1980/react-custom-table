@@ -1,0 +1,30 @@
+.sortable{
+	cursor: pointer;
+}
+
+.sortable:hover{
+	background: #aaa;
+	color: #fff;
+}
+
+.sortable:after{
+	content: '\2506';
+	color: #aaa;
+}
+
+.sortable:hover:after{
+	color: #fff;
+}
+
+.asc:after{
+	content: '\25BC';
+}
+
+.desc:after{
+	content: '\25B2';
+}
+
+.selected-row{
+	background: #aaa !important;
+	color: #fff !important;
+}

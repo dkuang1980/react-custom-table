@@ -109,7 +109,13 @@ class TableContainer extends Component {
                  activePage,
                  onPageClick: this.handlePageClick.bind(this)
                })
-            return child
+            return cloneElement(child, {
+              activePage,
+              sortCol,
+              sortDesc,
+              selectedRows: selectedRows.toJS(),
+              ...child.props
+            })
         })}
       </div>
     )

@@ -2,51 +2,107 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { TableContainer, Table, Paginator } from '../src/TableContainer';
 
-const simpleTable =
-    <TableContainer
-        columns={[{id: "name", title: "Name"}, {id: "gender", title: "Gender"}]}
-        rows={[{id: "1", name: "David", gender: "Male"}, {id: "2", name: "Kelly", gender: "Female"}]} >
-        <Table/>
-    </TableContainer>
+export const TopBar = ({
+  rows,
+  query,
+  onQueryChange,
+  onRowDelete,
+  sortCol,
+  sortDesc,
+  selectedRows,
+  activePage
+}) => {
 
-const formattedTable =
-    <TableContainer
-        columns={[{id: "name", title: "Name", formatFunc: (v) => <i>{v["name"]}</i>}, {id: "gender", title: "Gender"}]}
-        rows={[{id: "1", name: "David", gender: "Male"}, {id: "2", name: "Kelly", gender: "Female"}]}>
-        <Table/>
-    </TableContainer>
+  return (
+    <div className="row" style={{padding: "10px 0"}}>
+        <div className="col-sm-6">
+            <input
+                className="form-control"
+                type="text"
+                value={query}
+                onChange={(e) => onQueryChange(e.target.value, activePage, sortCol, sortDesc)}
+                placeholder="Search ..."/>
+        </div>
+        <div className="col-sm-6 text-right">
+            <button
+                className="btn btn-danger"
+                onClick={onRowDelete.bind(this, selectedRows)}>
+                Delete
+            </button>
+        </div>
+    </div>
+  )
+}
 
-class TableParent extends Component {
+export const PaginationInfo = ({
+    total,
+    pageSize,
+    activePage
+}) => {
+    const totalPages = total % pageSize === 0 ? parseInt(total / pageSize) : parseInt(total / pageSize) + 1
+    return (
+        <div className="pull-left" style={{margin: "20px 0", fontSize: "16px"}}>
+            <b>Total rows:</b> <i>{total}</i>
+            <span style={{marginLeft: "20px"}}><b>Page:</b> <i>{activePage + 1} / {totalPages}</i></span>
+        </div>
+    )
+}
+
+class TableDemo extends Component {
     constructor(props){
         super(props)
 
         const rows = [
-            {id: "1", name: "David", gender: "Male"},
-            {id: "2", name: "Kelly", gender: "Female"},
-            {id: "3", name: "James", gender: "Male"},
-            {id: "4", name: "Tim", gender: "Male"},
-            {id: "5", name: "Sam", gender: "Male"},
-            {id: "6", name: "Annie", gender: "Female"},
-            {id: "7", name: "Lucy", gender: "Female"}
+            {id: "1", name: "David", gender: "Male", age: "17", height: "176"},
+            {id: "2", name: "Kelly", gender: "Female", age: "19", height: "180"},
+            {id: "3", name: "James", gender: "Male", age: "12", height: "150"},
+            {id: "4", name: "Tim", gender: "Male", age: "39", height: "180"},
+            {id: "5", name: "Sam", gender: "Male", age: "49", height: "176"},
+            {id: "6", name: "Annie", gender: "Female", age: "26", height: "160"},
+            {id: "7", name: "Lucy", gender: "Female", age: "19", height: "170"}
         ]
 
         this.state = {
             rows: rows,
+            filteredRows: rows,
+            query: '',
             pageData: rows.slice(0, 4),
-            columns: [{id: "name", title: "Name", sortable: true}, {id: "gender", title: "Gender", sortable: false}],
+            columns: [
+                {id: "name", title: "Name", sortable: true},
+                {id: "gender", title: "Gender", template: (v) => <b style={{color: v.gender === "Male" ? 'blue' : 'pink'}}>{v.gender}</b>},
+                {id: "age", title: "Age", sortable: true},
+                {id: "height", title: "Height", sortable: false}
+            ],
             currentPage: 0
         }
+
+        this.reloadData.bind(this)
+    }
+
+    reloadData(col, desc, query){
+        const { rows } = this.state
+
+        let newRows = rows
+
+        if (col)
+            newRows = newRows.sort((a, b) => {
+                return desc ?
+                    (b[col] > a[col] ? -1 : 1) :
+                    (b[col] > a[col] ? 1 : -1)
+            })
+
+        newRows = newRows.filter(r => r.name.toLowerCase().indexOf(query.toLowerCase()) > -1)
+
+        return newRows
     }
 
     handleSort(page, col, desc){
-        const { rows } = this.state
-        const newRows = rows.sort((a, b) => {
-            return desc ?
-                (b[col] > a[col] ? -1 : 1) :
-                (b[col] > a[col] ? 1 : -1)
-        })
+        const { query } = this.state
+
+        const newRows = this.reloadData(col, desc, query)
+
         this.setState({
-            rows: newRows,
+            filteredRows: newRows,
             pageData: newRows.slice(page*4, (page+1)*4)
 
         })
@@ -54,32 +110,75 @@ class TableParent extends Component {
 
     handlePageClick(page, col, desc){
         const { rows } = this.state
+
         this.setState({
             pageData: rows.slice(page*4, (page+1)*4)
         })
     }
 
+    handleQueryChange(query, page, col, desc){
+        const newRows = this.reloadData(col, desc, query)
+
+        this.setState({
+            query,
+            filteredRows: newRows,
+            pageData: newRows.slice(0, 4)
+        })
+    }
+
+    handleDelete(selectedRows){
+        const { rows } = this.state
+        const newRows = rows.filter(r => selectedRows.indexOf(r.id) === -1)
+
+        this.setState({
+            rows: newRows,
+            filteredRows: newRows,
+            pageData: newRows.slice(0, 4)
+        })
+    }
+
     render(){
-        const { rows, columns, pageData} = this.state
+        const { rows, columns, filteredRows, pageData, query } = this.state
         return (
-            <TableContainer
-                columns={columns}
-                rows={pageData}
-                onSort={this.handleSort.bind(this)}
-                onPageChange={this.handlePageClick.bind(this)}>
-                <Table
-                    selectable={true}
-                    selectColumnFormat={(v) => <input type='checkbox' checked={v}/>}
-                    selectAllFormat={(v) => <input type='checkbox' checked={v}/>}/>
-                <Paginator
-                    total={rows.length}
-                    pageSize={4}/>
-            </TableContainer>
+            <div style={{padding: "20px"}}>
+                <h2 className="text-center"> React Custom Table with Bootstrap </h2>
+                <TableContainer
+                    containerClass="table-responsive"
+                    columns={columns}
+                    rows={pageData}
+                    onSort={this.handleSort.bind(this)}
+                    onPageChange={this.handlePageClick.bind(this)}>
+                    <TopBar
+                        rows={rows}
+                        query={query}
+                        onRowDelete={this.handleDelete.bind(this)}
+                        onQueryChange={this.handleQueryChange.bind(this)} />
+                    <Table
+                        tableClass="table table-bordered table-hover"
+                        sortableClass="sortable"
+                        sortDescClass="desc"
+                        sortAscClass="asc"
+                        selectedRowClass="selected-row"
+                        selectable={true}
+                        selectColumnTemplate={(v) => <input type='checkbox' checked={v}/>}
+                        selectAllTemplate={(v) => <input type='checkbox' checked={v}/>}/>
+                    <PaginationInfo
+                        total={filteredRows.length}
+                        pageSize={4} />
+                    <Paginator
+                        paginatorClass="pagination pull-right"
+                        total={filteredRows.length}
+                        firstPageTemplate={() => <a>{"<<"}</a>}
+                        prevPageTemplate={() => <a>{"<"}</a>}
+                        pageTemplate={(p) => <a>{p}</a>}
+                        nextPageTemplate={() => <a>{">"}</a>}
+                        lastPageTemplate={() => <a>{">>"}</a>}
+                        pageSize={4}/>
+                </TableContainer>
+            </div>
         )
     }
 }
 
-ReactDOM.render(simpleTable, document.getElementById("simpleTable"));
-ReactDOM.render(formattedTable, document.getElementById("formattedTable"));
-ReactDOM.render(<TableParent />, document.getElementById("TableParent"));
+ReactDOM.render(<TableDemo />, document.getElementById("demo"));
 
