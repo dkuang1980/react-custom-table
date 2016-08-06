@@ -114,6 +114,9 @@ class TableContainer extends Component {
               sortCol,
               sortDesc,
               selectedRows: selectedRows.toJS(),
+              onSort: this.handleSort.bind(this),
+              onRowClick: this.handleSelect.bind(this),
+              onSelectAll: this.handleSelectAll.bind(this),
               ...child.props
             })
         })}
