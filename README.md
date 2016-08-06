@@ -86,12 +86,12 @@ const columns = [
     {id: "age", title: "Age", sortable: true},
     {id: "height", title: "Height", sortable: false}
 ]
-const pageData = {
+const pageData = [
     {id: "1", name: "David", gender: "Male", age: "17", height: "176"},
     {id: "2", name: "Kelly", gender: "Female", age: "19", height: "180"},
     {id: "3", name: "James", gender: "Male", age: "12", height: "150"},
     {id: "4", name: "Tim", gender: "Male", age: "39", height: "180"}
-}
+]
 
 <TableContainer
     containerClass="table-responsive"
