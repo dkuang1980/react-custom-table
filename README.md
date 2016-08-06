@@ -3,10 +3,10 @@
 Render table in react, fully customizable, compatible with redux.
 
 ## Our features:
-- 1. We render table and handle pagination.
-- 2. We are not including any css, you can use whatever css library (i.e. Bootstrap, Foundation, Material-UI) you want, and it is easy to integrate.
-- 3. This plugin is designed to work with redux. For all data query events (i.e. sorting, changing page), we provide a callback with the current state of the table (i.e. active page, sorted column, sorting direction), you can easily hook it up with your action (i.e. trigger ajax request) for redux to get the new data back to the table.
-- 4. You can easily extend the functionality of the table to do something like keywords search, delete selected rows, edit selected row, etc. As long as you define your component within our scope, you will get all state of the table through your props.
+- We render table and handle pagination.
+- We are not including any css, you can use whatever css library (i.e. Bootstrap, Foundation, Material-UI) you want, and it is easy to integrate.
+- This plugin is designed to work with redux. For all data query events (i.e. sorting, changing page), we provide a callback with the current state of the table (i.e. active page, sorted column, sorting direction), you can easily hook it up with your action (i.e. trigger ajax request) for redux to get the new data back to the table.
+- You can easily extend the functionality of the table to do something like keywords search, delete selected rows, edit selected row, etc. As long as you define your component within our scope, you will get all state of the table through your props.
 
 
 ## Demo
@@ -27,7 +27,7 @@ npm install react-custom-table --save
 
 ## Usage
 
-To generate a simple table:
+### To generate a simple table
 
 ```
 import React from 'react';
@@ -53,7 +53,7 @@ import { TableContainer, Table } from 'react-custom-table';
 </TableContainer>
 ```
 
-To generate a table with pagination
+### To generate a table with pagination
 
 ```
 import React from 'react';
@@ -76,5 +76,6 @@ import { TableContainer, Table, Paginator } from 'react-custom-table';
     <Paginator total={7} pageSize={4} />
 </TableContainer>
 ```
+
 
 To see more details for the usage, please check the code in our demo folder.
