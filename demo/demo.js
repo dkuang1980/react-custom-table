@@ -26,7 +26,7 @@ export const TopBar = ({
         <div className="col-sm-6 text-right">
             <button
                 className="btn btn-danger"
-                onClick={onRowDelete.bind(this, selectedRows)}>
+                onClick={onRowDelete.bind(this, selectedRows, activePage)}>
                 Delete
             </button>
         </div>
@@ -44,6 +44,28 @@ export const PaginationInfo = ({
         <div className="pull-left" style={{margin: "20px 0", fontSize: "16px"}}>
             <b>Total rows:</b> <i>{total}</i>
             <span style={{marginLeft: "20px"}}><b>Page:</b> <i>{activePage + 1} / {totalPages}</i></span>
+        </div>
+    )
+}
+
+export const PageSizeSelector = ({
+    activePage,
+    pageSizeList,
+    currentPageSize,
+    onChange
+}) => {
+    return (
+        <div className="pull-right btn-group" style={{margin: "20px 20px", fontSize: "16px"}}>
+            {pageSizeList.map(size => {
+                return(
+                    <button
+                        className={`btn btn-${currentPageSize===size ? 'success' : 'default'}`}
+                        onClick={onChange.bind(this, size, activePage)}>
+                            {`${size} per page`}
+                     </button>
+                )
+            })
+        }
         </div>
     )
 }
@@ -66,6 +88,7 @@ class TableDemo extends Component {
             rows: rows,
             filteredRows: rows,
             query: '',
+            pageSize: 4,
             pageData: rows.slice(0, 4),
             columns: [
                 {id: "name", title: "Name", sortable: true},
@@ -97,50 +120,68 @@ class TableDemo extends Component {
     }
 
     handleSort(page, col, desc){
-        const { query } = this.state
+        const { query, pageSize } = this.state
 
         const newRows = this.reloadData(col, desc, query)
 
         this.setState({
             filteredRows: newRows,
-            pageData: newRows.slice(page*4, (page+1)*4)
+            pageData: newRows.slice(page*pageSize, (page+1)*pageSize)
 
         })
     }
 
     handlePageClick(page, col, desc){
-        const { rows } = this.state
+        const { rows, pageSize } = this.state
 
         this.setState({
-            pageData: rows.slice(page*4, (page+1)*4)
+            pageData: rows.slice(page*pageSize, (page+1)*pageSize)
         })
     }
 
     handleQueryChange(query, page, col, desc){
+        const { pageSize } = this.state
         const newRows = this.reloadData(col, desc, query)
 
         this.setState({
             query,
             filteredRows: newRows,
-            pageData: newRows.slice(0, 4)
+            pageData: newRows.slice(0, pageSize)
         })
     }
 
-    handleDelete(selectedRows){
-        const { rows } = this.state
+    handleDelete(selectedRows, page){
+        const { rows, pageSize } = this.state
         const newRows = rows.filter(r => selectedRows.indexOf(r.id) === -1)
+        let newPage = page
+        if ((page+1)*pageSize > newRows.length)
+            newPage =  newRows.length % pageSize === 0 ? parseInt(newRows.length / pageSize) - 1 : parseInt(newRows.length / pageSize)
 
         this.setState({
             rows: newRows,
             filteredRows: newRows,
-            pageData: newRows.slice(0, 4)
+            pageData: newRows.slice(newPage*pageSize, (newPage+1)*pageSize)
+        })
+    }
+
+    handlePageSizeChange(pageSize, page){
+        const { rows } = this.state
+
+        let newPage = page
+        if ((page+1)*pageSize > rows.length)
+            newPage =  rows.length % pageSize === 0 ? parseInt(rows.length / pageSize) - 1 : parseInt(rows.length / pageSize)
+
+
+        this.setState({
+            pageData: rows.slice(newPage*pageSize, (newPage+1)*pageSize),
+            pageSize
         })
     }
 
     render(){
-        const { rows, columns, filteredRows, pageData, query } = this.state
+        const { rows, columns, filteredRows, pageData, query, pageSize } = this.state
         return (
-            <div style={{padding: "20px"}}>
+            <div style={{padding: "30px"}}>
                 <h2 className="text-center"> React Custom Table with Bootstrap </h2>
                 <TableContainer
                     containerClass="table-responsive"
@@ -164,7 +205,8 @@ class TableDemo extends Component {
                         selectAllTemplate={(v) => <input type='checkbox' checked={v}/>}/>
                     <PaginationInfo
                         total={filteredRows.length}
-                        pageSize={4} />
+                        pageSize={pageSize} />
+
                     <Paginator
                         paginatorClass="pagination pull-right"
                         total={filteredRows.length}
@@ -173,7 +215,11 @@ class TableDemo extends Component {
                         pageTemplate={(p) => <a>{p}</a>}
                         nextPageTemplate={() => <a>{">"}</a>}
                         lastPageTemplate={() => <a>{">>"}</a>}
-                        pageSize={4}/>
+                        pageSize={pageSize}/>
+                    <PageSizeSelector
+                        pageSizeList={[1, 2, 4]}
+                        currentPageSize={pageSize}
+                        onChange={this.handlePageSizeChange.bind(this)} />
                 </TableContainer>
             </div>
         )
