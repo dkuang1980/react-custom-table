@@ -5,11 +5,8 @@
   "main": "index.js",
   "repository": "git@github.com:Da-Kuang/react-custom-table.git",
   "scripts": {
-    "demo": "cd demo && webpack-dev-server --progress",
-    "start": "node ./node_modules/webpack-dev-server/bin/webpack-dev-server.js",
-    "dev": "webpack --progress  --watch",
-    "test": "mocha --compilers js:babel-core/register --require ./test/test_helper.js --recursive ./test",
-    "test:watch": "npm run test -- --watch"
+    "demo": "cd demo && webpack-dev-server --progress --hot --inline",
+    "dev": "webpack --progress  --watch"
   },
   "author": "Da Kuang",
   "license": "MIT",
