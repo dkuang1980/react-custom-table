@@ -10,7 +10,7 @@ Render table in react, fully customizable, compatible with redux.
 
 ## Demo
 
-Live Demo: https://da-kuang.github.io/react-custom-table/
+Live Demo: https://dkuang1980.github.io/react-custom-table/
 
 Run demo locally:
 ```
